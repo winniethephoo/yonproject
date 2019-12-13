@@ -1,0 +1,64 @@
+<template>
+  <v-layout
+    column
+    justify-center
+    align-center
+     >
+    <banmen v-if="typeof games[0]!=='undefined'" :board="games[0].board">
+    </banmen>
+    <svg v-if="started" width=800 height=800>
+     
+    </svg>
+    <v-btn @click="start">
+      start
+    </v-btn>
+  </v-layout>
+</template>
+
+<script>
+import banmen from '~/components/banmen.vue'
+import axios from 'axios';
+import firebase from "~/plugins/firebase.js";
+import { mapGetters} from 'vuex';
+const db = firebase.firestore();
+
+export default {
+  components: {
+      banmen      
+  },
+    data(){
+	return {
+	    started:false
+	}
+    },
+    computed: {
+　　　 // VuexからPostsデータを取得
+      ...mapGetters(['games'])
+   },
+    created: function () {
+　　　　// firestoreのpostsをバインド
+      this.$store.dispatch('setGamesRef', db.collection('games'))
+    },
+    methods: {
+	start:function(){
+	    this.started=true;
+	    console.log(this.games);
+	},
+	
+	shoot:function(j){
+	    db.collection('games').add({j:j});
+	},
+	sendData: function () {
+	    　　　　　　// データのチェック
+            if (this.message == "" || this.message.length > 100) {
+		return false;
+            }
+            let dbdata = {
+		message: this.message
+            };
+	    　　　　　　// データの登録
+            db.collection('games').add(dbdata);
+	}
+    }
+}
+</script>
